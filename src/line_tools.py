@@ -118,7 +118,8 @@ class LineToolsRT:
                         line_point1.y + t * dy,
                         line_point1.z + t * dz
                     )
-                    if constrain_to_segment and Point3D.distance(point, sphere_center) > sphere_radius:
+                    if constrain_to_segment and round(Point3D.distance(point, sphere_center), 6) > round(sphere_radius, 6):
+                        # round the above numbers to work around floating point precision issues
                         continue
                     results.append(point)
 

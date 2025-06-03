@@ -280,3 +280,15 @@ class TestRTFPA:
         # Check that sphere centers are being set
         assert rd.min_sphere_center[0] is not None
         assert rd.max_sphere_center[0] is not None
+
+    def test_rtfpa_full_suite(self, sample_rtfpa, sample_datetime):
+        sample_rtfpa.new_reading("subject1", 1.0, 2.0, 3.0, sample_datetime)
+        sample_rtfpa.new_reading("subject1", 2.0, 3.0, 4.0, sample_datetime+timedelta(seconds=1))
+        sample_rtfpa.new_reading("subject1", 3.0, 4.0, 5.0, sample_datetime + timedelta(seconds=2))
+        sample_rtfpa.new_reading("subject1", 4.0, 5.0, 6.0, sample_datetime + timedelta(seconds=3))
+        sample_rtfpa.new_reading("subject1", 5.0, 6.0, 7.0, sample_datetime + timedelta(seconds=4))
+        sample_rtfpa.new_reading("subject1", 6.0, 7.0, 8.0, sample_datetime + timedelta(seconds=5))
+
+        assert len(sample_rtfpa.tracked_objects_running_d)==1
+        assert "subject1" in sample_rtfpa.tracked_objects_running_d
+        assert 0.9 < sample_rtfpa.tracked_objects_running_d["subject1"].D < 1.1

@@ -250,7 +250,7 @@ class RunningD:
 
             # Determine which intersection point is closer to new_point
             d0 = Point3D.distance(intersect_points[0], new_point)
-            d1 = Point3D.distance(intersect_points[1], new_point) if len(intersect_points) > 1 else float('inf')
+            d1 = Point3D.distance(intersect_points[1], new_point) if len(intersect_points) > 1 else float('inf') # set d1 to inf if there is only 1 intersection point
 
             if d0 < d1:
                 running_total += scale
@@ -264,7 +264,7 @@ class RunningD:
             # if distance_to_new_point >= scale:
             #     pass # Continue with same index to keep walking the line with the ruler of scale size
             # else:
-            if distance_to_new_point < scale: # if the new point is within the scale ruler size, move on to the next set of calculations
+            if distance_to_new_point <= scale: # if the new point is within the scale ruler size, move on to the next set of calculations
                 path_length_list[i] += running_total
                 running_total = 0
                 i += 1  # increase the loop index

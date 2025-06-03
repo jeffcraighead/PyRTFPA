@@ -52,7 +52,7 @@ class RTFPA:
         # Calculate fractal dimension
         rd = self.tracked_objects_running_d[subject_id]
         #rd.fractal(self.constrain_to_plane, False)
-        self.tracked_objects_running_d[subject_id] = rd
+        #self.tracked_objects_running_d[subject_id] = rd
 
         return rd
 
