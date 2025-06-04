@@ -49,20 +49,14 @@ class RTFPA:
             # New subject
             self.start_new_path(subject_id, new_point, timestamp)
 
-        # Calculate fractal dimension
-        rd = self.tracked_objects_running_d[subject_id]
-        #rd.fractal(self.constrain_to_plane, False)
-        #self.tracked_objects_running_d[subject_id] = rd
 
-        return rd
+        return self.tracked_objects_running_d[subject_id]
 
 
     def start_new_path(self, subject_id: str, new_point: Point3D, timestamp: datetime) -> None:
         """Start a new path for the subject"""
-        self.tracked_objects_running_d[subject_id] = RunningD(subject_id, new_point.x, new_point.y, new_point.z, timestamp)
+        self.tracked_objects_running_d[subject_id] = RunningD(subject_id, new_point, timestamp, self.min_multiplier, self.max_multiplier)
         self.tracked_objects_running_d[subject_id].velocity_mode = self.velocity_mode
-        self.tracked_objects_running_d[subject_id].min_multiplier = self.min_multiplier
-        self.tracked_objects_running_d[subject_id].max_multiplier = self.max_multiplier
 
 
     def _continue_path(self, current_path_rd: RunningD, new_point: Point3D, timestamp: datetime) -> None:

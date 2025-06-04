@@ -44,73 +44,7 @@ class RunningD:
     # Fractal dimension result
     D: float = 0.0
 
-    def __init__(self, subject_id: str, x: float, y: float, z: float, timestamp: datetime):
-        """
-        Initialize RunningD with subject ID, position, and timestamp.
-
-        Args:
-            subject_id: Unique identifier for the tracked subject
-            x, y, z: Initial position coordinates
-            timestamp: Timestamp in ticks (100ns intervals since epoch)
-        """
-        self.subject_id = subject_id
-        self.position = Point3D(x, y, z)
-        self.timestamp = timestamp
-
-        # Initialize arrays with proper sizes
-        self.min_sphere_center = [None] * 4
-        self.max_sphere_center = [None] * 4
-        self.min_path_length = [0.0] * 4
-        self.max_path_length = [0.0] * 4
-
-        # Set initial sphere centers to the starting position
-        self.min_sphere_center[0] = Point3D(x, y, z)
-        self.max_sphere_center[0] = Point3D(x, y, z)
-
-        # Initialize all numeric fields
-        self.real_path_length = 0.0
-        self.number_of_steps = 0
-        self.mean_step_size = 0.0
-        self.min_step_size = 0.0
-        self.max_step_size = 0.0
-        self.min_multiplier = 0.5
-        self.max_multiplier = 10.0
-
-        self.step_time = 0.0
-        self.step_velocity = 0.0
-        self.total_step_velocity = 0.0
-        self.mean_step_velocity = 0.0
-        self.max_step_velocity = 0.0
-        self.min_step_velocity = 0.0
-
-        self.D = 0.0
-
-    def reset_path(self):
-        """Reset all path-related measurements for starting a new path"""
-        # Reset path lengths
-        self.min_path_length = [0.0] * 4
-        self.max_path_length = [0.0] * 4
-
-        # Reset step measurements
-        self.real_path_length = 0.0
-        self.number_of_steps = 0
-        self.min_step_size = 0.0
-        self.max_step_size = 0.0
-        self.mean_step_size = 0.0
-        self.min_multiplier = 0.5
-        self.max_multiplier = 10.0
-
-        # Reset time and velocity measurements
-        self.step_time = 0.0
-        self.step_velocity = 0.0
-        self.total_step_velocity = 0.0
-        self.mean_step_velocity = 0.0
-        self.max_step_velocity = 0.0
-        self.min_step_velocity = 0.0
-
-        # Reset sphere centers
-        self.min_sphere_center = [None] * 4
-        self.max_sphere_center = [None] * 4
+    def __post_init__(self):
         self.min_sphere_center[0] = self.position
         self.max_sphere_center[0] = self.position
 

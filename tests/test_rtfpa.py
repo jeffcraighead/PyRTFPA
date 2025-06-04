@@ -147,7 +147,7 @@ class TestRTFPA:
     def test_continue_path_measurements(self, sample_rtfpa, sample_datetime):
         """Test _continue_path method measurements"""
         # Create initial RunningD
-        rd = RunningD("subject1", 0.0, 0.0, 0.0, sample_datetime)
+        rd = RunningD("subject1", Point3D(0,0,0), sample_datetime)
         sample_rtfpa.tracked_objects_running_d["subject1"] = rd
         
         # Continue path
@@ -164,7 +164,7 @@ class TestRTFPA:
     def test_continue_path_measurements_five_steps(self, sample_rtfpa, sample_datetime):
         """Test _continue_path method measurements"""
         # Create initial RunningD
-        rd = RunningD("subject1", 0.0, 0.0, 0.0, sample_datetime)
+        rd = RunningD("subject1", Point3D(0,0,0), sample_datetime)
         rd.min_multiplier = sample_rtfpa.min_multiplier
         rd.max_multiplier = sample_rtfpa.max_multiplier
         sample_rtfpa.tracked_objects_running_d[rd.subject_id] = rd
@@ -192,7 +192,7 @@ class TestRTFPA:
         """Test _continue_path with XY plane constraint"""
         sample_rtfpa.set_plane_constraint(True)
         
-        rd = RunningD("subject1", 0.0, 0.0, 0.0, sample_datetime)
+        rd = RunningD("subject1", Point3D(0,0,0), sample_datetime)
         sample_rtfpa.tracked_objects_running_d["subject1"] = rd
         
         # Move in XY plane with Z difference
@@ -205,11 +205,6 @@ class TestRTFPA:
     def test_continue_path_velocity_mode(self, sample_rtfpa, sample_datetime):
         """Test _continue_path in velocity mode"""
         sample_rtfpa.set_velocity_mode(True)
-        
-        # rd = RunningD("subject1", 0.0, 0.0, 0.0, sample_datetime)
-        # rd.step_time = 1.0  # Simulate step time
-        # sample_rtfpa.tracked_objects_running_d["subject1"] = rd
-
 
         sample_rtfpa.start_new_path("subject1", Point3D(0.0, 0.0, 0.0), sample_datetime)
         rd = sample_rtfpa.tracked_objects_running_d["subject1"]

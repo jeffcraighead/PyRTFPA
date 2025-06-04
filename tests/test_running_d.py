@@ -30,14 +30,14 @@ def sample_datetime():
 def sample_running_d():
     """Create a sample RunningD object for testing"""
     timestamp = datetime(2023, 1, 1, 12, 0, 0)
-    return RunningD("test_subject", 1.0, 2.0, 3.0, timestamp)
+    return RunningD("test_subject", Point3D(1.0, 2.0, 3.0), timestamp, 0.5, 10.0)
 
 class TestRunningD:
     """Test cases for RunningD class"""
 
     def test_running_d_initialization(self, sample_datetime):
         """Test RunningD initialization"""
-        rd = RunningD("test_subject", 1.0, 2.0, 3.0, sample_datetime)
+        rd = RunningD("test_subject", Point3D(1.0, 2.0, 3.0), sample_datetime, 0.5, 10.0)
         
         assert rd.subject_id == "test_subject"
         assert rd.position.x == 1.0
@@ -69,33 +69,6 @@ class TestRunningD:
         assert "test_subject" in repr_str
         assert "D=" in repr_str
         assert "steps=" in repr_str
-
-    def test_reset_path(self, sample_running_d):
-        """Test path reset functionality"""
-        # Modify some values first
-        sample_running_d.real_path_length = 10.0
-        sample_running_d.number_of_steps = 5
-        sample_running_d.min_path_length[0] = 5.0
-        sample_running_d.max_path_length[0] = 15.0
-        sample_running_d.mean_step_size = 2.0
-        
-        # Reset path
-        sample_running_d.reset_path()
-        
-        # Check that values are reset
-        assert sample_running_d.real_path_length == 0.0
-        assert sample_running_d.number_of_steps == 0
-        assert all(length == 0.0 for length in sample_running_d.min_path_length)
-        assert all(length == 0.0 for length in sample_running_d.max_path_length)
-        assert sample_running_d.mean_step_size == 0.0
-        assert sample_running_d.min_step_size == 0.0
-        assert sample_running_d.max_step_size == 0.0
-        
-        # Check sphere centers are reset but first one is set to current position
-        assert sample_running_d.min_sphere_center[0] == sample_running_d.position
-        assert sample_running_d.max_sphere_center[0] == sample_running_d.position
-        assert all(center is None for center in sample_running_d.min_sphere_center[1:])
-        assert all(center is None for center in sample_running_d.max_sphere_center[1:])
 
     def test_fractal_with_zero_scales(self, sample_running_d):
         """Test fractal calculation with zero scales"""
