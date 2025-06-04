@@ -1,6 +1,6 @@
 # tests/test_line_tools.py
 import math
-from src.line_tools import Point3D, LineToolsRT
+from rtfpa.line_tools import Point3D, LineToolsRT
 
 
 class TestPoint3D:

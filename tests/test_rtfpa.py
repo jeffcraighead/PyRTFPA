@@ -1,9 +1,9 @@
 # tests/test_rtfpa.py
 import pytest
 from datetime import datetime, timedelta
-from src.rtfpa import RTFPA
-from src.running_d import RunningD
-from src.line_tools import Point3D
+from rtfpa.rtfpa import RTFPA
+from rtfpa.running_d import RunningD
+from rtfpa.line_tools import Point3D
 
 
 @pytest.fixture

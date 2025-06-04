@@ -8,6 +8,11 @@ import os
 from typing import Optional
 from enum import Enum
 
+
+#
+# This is a AI conversion of the main program for the C# version. Untested and probably lots need to be adjusted/removed.
+#
+
 class CtrlTypes(Enum):
     """Control message types for handler routine"""
     CTRL_C_EVENT = 0

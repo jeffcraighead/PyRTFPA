@@ -2,8 +2,8 @@
 import pytest
 import math
 from datetime import datetime
-from src.running_d import RunningD
-from src.line_tools import Point3D
+from rtfpa.running_d import RunningD
+from rtfpa.line_tools import Point3D
 
 @pytest.fixture
 def sample_point3d():

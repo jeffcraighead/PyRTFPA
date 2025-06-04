@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Dict
-from src.line_tools import Point3D
-from src.running_d import RunningD
+from rtfpa.line_tools import Point3D
+from rtfpa.running_d import RunningD
 
 class RTFPA:
     """Real-Time Fractal Path Analysis class"""
