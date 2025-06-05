@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Iterator, Optional, Any
+from typing import Iterator, Optional, Any, Tuple
 
 import pandas as pd
 
@@ -51,10 +51,12 @@ class EyeTrackingCSVAdapter(DataAdapter):
     file_path: Path
     eye: str = "Left"
     scale_factor: float = 1.0
+    clip_range: Optional[Tuple[float, float]] = None
 
     # Derived attributes
     x_column: str = field(init=False)
     y_column: str = field(init=False)
+    subject_id: str = field(init=False)
     df: Optional[pd.DataFrame] = field(init=False, default=None)
 
     def __post_init__(self):
@@ -67,6 +69,9 @@ class EyeTrackingCSVAdapter(DataAdapter):
         """Load the CSV file"""
         if not self.file_path.exists():
             raise FileNotFoundError(f"CSV file not found: {self.file_path}")
+
+        # For CSV we use the filename as the subject_id if it's not set already
+        self.subject_id = kwargs.get("subject_id", self.file_path.stem)
 
         # Read CSV with proper datetime parsing
         self.df = pd.read_csv(
@@ -87,6 +92,11 @@ class EyeTrackingCSVAdapter(DataAdapter):
         # Sort by time
         self.df = self.df.sort_values('Time')
 
+        # Clamp values is clip_range is specified
+        if self.clip_range is not None:
+            self.df[self.x_column] = self.df[self.x_column].clip(*self.clip_range)
+            self.df[self.y_column] = self.df[self.y_column].clip(*self.clip_range)
+
     def get_data_stream(self) -> Iterator[DataPoint]:
         """Yield data points from the CSV"""
         if self.df is None:
@@ -99,7 +109,7 @@ class EyeTrackingCSVAdapter(DataAdapter):
 
             yield DataPoint(
                 timestamp=row['Time'].to_pydatetime(),
-                subject_id=f"{self.eye}_eye",
+                subject_id=self.subject_id,
                 x=row[self.x_column] * self.scale_factor,
                 y=row[self.y_column] * self.scale_factor,
                 z=0.0  # Eye tracking is 2D
