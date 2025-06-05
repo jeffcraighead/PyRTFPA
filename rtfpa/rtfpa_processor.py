@@ -164,7 +164,7 @@ if __name__ == "__main__":
     )
 
     results = process_csv_file(
-        Path("eye_tracking_data.csv"),
+        Path("../data/060930011.110425.085748.ESUEvents.eyepose_events.csv"),
         eye="Left",
         scale_factor=1920.0,  # Scale to screen pixels
         config=config

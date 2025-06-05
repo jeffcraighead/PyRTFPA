@@ -2,7 +2,7 @@ import math
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List, Optional
-from rtfpa.line_tools import Point3D, LineToolsRT
+from line_tools import Point3D, LineToolsRT
 
 
 @dataclass
