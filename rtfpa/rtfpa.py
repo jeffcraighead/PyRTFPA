@@ -6,9 +6,9 @@ from running_d import RunningD
 class RTFPA:
     """Real-Time Fractal Path Analysis class"""
 
-    def __init__(self, min_mul: float = 0.5, max_mul: float = 10.0):
-        self.min_multiplier = min_mul
-        self.max_multiplier = max_mul
+    def __init__(self, min_multiplier: float = 0.5, max_multiplier: float = 10.0):
+        self.min_multiplier = min_multiplier
+        self.max_multiplier = max_multiplier
         self.velocity_mode = False
         self.tracked_objects_running_d: Dict[str, RunningD] = {}
         self.seconds_till_new_path = 60
@@ -16,7 +16,7 @@ class RTFPA:
 
 
     def new_reading(self, subject_id: str, x: float, y: float, z: float,
-                    timestamp: datetime) -> RunningD:
+                    timestamp: datetime) -> RunningD | None:
         """Process a new reading with datetime object"""
 
         # Create temporary RunningD for comparisons
@@ -29,10 +29,10 @@ class RTFPA:
             # Check if point is in same position as before
             if self.constrain_to_plane:
                 if Point3D.xy_distance(new_point, tracked_running_d.position) == 0.0:
-                    return tracked_running_d
+                    return None
             else:
                 if Point3D.distance(new_point, tracked_running_d.position) == 0.0:
-                    return tracked_running_d
+                    return None
 
             # Check if we need to start a new path
             time_diff_seconds = abs(timestamp - tracked_running_d.end_timestamp)
@@ -40,6 +40,7 @@ class RTFPA:
             if time_diff_seconds > timedelta(seconds=self.seconds_till_new_path):
                 # Start a new path
                 self.start_new_path(subject_id, new_point, timestamp)
+                return self.tracked_objects_running_d[subject_id]
             else:
                 # Continue existing path
                 self._continue_path(tracked_running_d, new_point, timestamp)
@@ -48,9 +49,10 @@ class RTFPA:
         else:
             # New subject
             self.start_new_path(subject_id, new_point, timestamp)
+            return self.tracked_objects_running_d[subject_id]
 
+        return None
 
-        return self.tracked_objects_running_d[subject_id]
 
 
     def start_new_path(self, subject_id: str, new_point: Point3D, timestamp: datetime) -> None:

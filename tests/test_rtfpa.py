@@ -30,7 +30,7 @@ def sample_points_list():
 @pytest.fixture
 def sample_rtfpa():
     """Create a sample RTFPA object for testing"""
-    return RTFPA(min_mul=0.5, max_mul=5.0)
+    return RTFPA(min_multiplier=0.5, max_multiplier=5.0)
 
 class TestRTFPA:
     """Test cases for RTFPA class"""
@@ -47,7 +47,7 @@ class TestRTFPA:
         assert len(rtfpa.tracked_objects_running_d) == 0
 
         # Test custom initialization
-        rtfpa_custom = RTFPA(min_mul=0.3, max_mul=15.0)
+        rtfpa_custom = RTFPA(min_multiplier=0.3, max_multiplier=15.0)
         assert rtfpa_custom.min_multiplier == 0.3
         assert rtfpa_custom.max_multiplier == 15.0
 

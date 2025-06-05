@@ -9,11 +9,11 @@ from rtfpa import RTFPA, RunningD
 @dataclass
 class ProcessingConfig:
     """Configuration for RTFPA processing"""
-    min_mult: float = 0.5
-    max_mult: float = 10.0
+    min_multiplier: float = 0.5
+    max_multiplier: float = 10.0
     constrain_to_plane: bool = True
     velocity_mode: bool = False
-    path_timeout: int = 60
+    path_timeout: int = 10
     max_points: Optional[int] = None
     progress_callback: Optional[Callable[[int, Optional[int]], None]] = None
 
@@ -28,7 +28,7 @@ class RTFPAProcessor:
 
     def __post_init__(self):
         """Initialize RTFPA with configuration"""
-        self.rtfpa = RTFPA(self.config.min_mult, self.config.max_mult)
+        self.rtfpa = RTFPA(self.config.min_multiplier, self.config.max_multiplier)
         self.rtfpa.set_plane_constraint(self.config.constrain_to_plane)
         self.rtfpa.set_velocity_mode(self.config.velocity_mode)
         self.rtfpa.set_timeout(self.config.path_timeout)
@@ -58,7 +58,7 @@ class RTFPAProcessor:
             # Store results
             if data_point.subject_id not in self.results:
                 self.results[data_point.subject_id] = []
-            if running_d.number_of_steps == 0: # append the running_d object each time we have a new path (thus a new running_d).
+            if running_d is not None: # append the running_d object each time we have a new path (thus a new running_d).
                 self.results[data_point.subject_id].append(running_d)
 
             point_count += 1
@@ -96,8 +96,8 @@ class RTFPAProcessor:
                 'end_timestamp': rd.end_timestamp,
                 'D': rd.D,
                 'steps': rd.number_of_steps,
-                'path_length': rd.real_path_length,
-                'mean_step_size': rd.mean_step_size
+                'path_length': round(rd.real_path_length,3),
+                'mean_step_size': round(rd.mean_step_size,3)
             })
 
         return pd.DataFrame(data)
@@ -159,8 +159,8 @@ def process_csv_file(
 if __name__ == "__main__":
     # Example 1: Process CSV file with custom configuration
     config = ProcessingConfig(
-        min_mult=0.5,
-        max_mult=10.0,
+        min_multiplier=0.5,
+        max_multiplier=10.0,
         constrain_to_plane=True,
         velocity_mode=False,
         progress_callback=lambda current, total: print(f"Progress: {current}") if current % 100 == 0 else None
