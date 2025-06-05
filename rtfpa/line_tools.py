@@ -113,15 +113,16 @@ class LineToolsRT:
             results = []
             for t in [t1, t2]:
                 if not constrain_to_segment or (0.0 <= t <= 1.0):
-                    point = Point3D(
+                    intersecting_point = Point3D(
                         line_point1.x + t * dx,
                         line_point1.y + t * dy,
                         line_point1.z + t * dz
                     )
-                    if constrain_to_segment and round(Point3D.distance(point, sphere_center), 6) > round(sphere_radius, 6):
-                        # round the above numbers to work around floating point precision issues
+                    distance_to_intersecting_point = Point3D.distance(intersecting_point, sphere_center)
+                    distance_gt_radius =  distance_to_intersecting_point - sphere_radius # need to check this against a small value below due to some precision issues (I think)
+                    if constrain_to_segment and distance_gt_radius > 1e-6:
                         continue
-                    results.append(point)
+                    results.append(intersecting_point)
 
             return results if results else None
 
