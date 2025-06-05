@@ -1,7 +1,14 @@
+import os
 from dataclasses import field, dataclass
+from tkinter import filedialog
+from colorama import init, Fore, Style
+import pandas
 import pandas as pd
 from typing import Optional, Dict, List, Callable
 from pathlib import Path
+
+import tkinter as tk
+
 from data_adapters import DataAdapter, EyeTrackingCSVAdapter
 from rtfpa import RTFPA, RunningD
 
@@ -13,7 +20,7 @@ class ProcessingConfig:
     max_multiplier: float = 10.0
     constrain_to_plane: bool = True
     velocity_mode: bool = False
-    path_timeout: int = 10
+    path_timeout: int = 60
     max_points: Optional[int] = None
     progress_callback: Optional[Callable[[int, Optional[int]], None]] = None
 
@@ -33,7 +40,7 @@ class RTFPAProcessor:
         self.rtfpa.set_velocity_mode(self.config.velocity_mode)
         self.rtfpa.set_timeout(self.config.path_timeout)
 
-    def process_data(self, adapter: DataAdapter) -> Dict[str, RunningD]:
+    def process_data(self, adapter: DataAdapter) -> list[str]:
         """
         Process data from an adapter
 
@@ -71,12 +78,7 @@ class RTFPAProcessor:
             if self.config.max_points and point_count >= self.config.max_points:
                 break
 
-        # Return final RunningD for each subject
-        return {
-            subject_id: readings[-1]
-            for subject_id, readings in self.results.items()
-            if readings
-        }
+        return [*self.results] # return a list of subject_id strings since these are the keys to self.results
 
     def get_time_series(self, subject_id: str) -> pd.DataFrame:
         """
@@ -107,9 +109,6 @@ class RTFPAProcessor:
 class ProcessingResult:
     """Results from processing a dataset"""
     subject_id: str
-    final_d: float
-    total_steps: int
-    path_length: float
     time_series: pd.DataFrame = field(default_factory=pd.DataFrame)
 
 
@@ -117,7 +116,8 @@ class ProcessingResult:
 def process_csv_file(
     file_path: Path,
     eye: str = "Left",
-    scale_factor: float = 1.0,
+    x_scale_factor: float = 1.0,
+    y_scale_factor: float = 1.0,
     config: Optional[ProcessingConfig] = None
 ) -> Dict[str, ProcessingResult]:
     """
@@ -137,51 +137,89 @@ def process_csv_file(
 
     processor = RTFPAProcessor(config)
 
-    with EyeTrackingCSVAdapter(file_path, eye, scale_factor, (0.0, 1.0)) as adapter:
+    with EyeTrackingCSVAdapter(file_path, eye, x_scale_factor, y_scale_factor, (0.0, 1.0)) as adapter:
         adapter.initialize()
-        final_results = processor.process_data(adapter)
+        subject_ids = processor.process_data(adapter)
 
         # Create ProcessingResult objects
         results = {}
-        for subject_id, final_rd in final_results.items():
-            results[subject_id] = ProcessingResult(
-                subject_id=subject_id,
-                final_d=final_rd.D,
-                total_steps=final_rd.number_of_steps,
-                path_length=final_rd.real_path_length,
-                time_series=processor.get_time_series(subject_id)
-            )
+        # TODO - need to change the items in the ProcessingResult object. We don't care about most of those.
+        for subject_id in subject_ids:
+            results[subject_id] = ProcessingResult(subject_id=subject_id, time_series=processor.get_time_series(subject_id))
 
         return results
 
 
-# Example usage
-if __name__ == "__main__":
-    # Example 1: Process CSV file with custom configuration
+def select_data_root() -> str:
+    # Create (and hide) the root window
+    root = tk.Tk()
+    root.withdraw()
+
+    # Code that pops a dialog box to choose file we wish to work on
+    # Make sure dialogs pop up in front
+    root.attributes('-topmost', True)
+    root.update()
+
+    print("Chose the folder that contains ESUEvents.csv files.")
+    # Show the standard file-open dialog
+    events_path = filedialog.askdirectory(
+        title="Select a folder that contains the CSV events file",
+    )
+    print("You selected:", events_path)
+
+    # Clean up the hidden root window
+    root.destroy()
+
+    return events_path
+
+# Iterate through a directory and subdirectories and process any file that is named ESUEvents.edf
+def process_directory_tree(directory_path):
+    for dirpath, dirnames, filenames in os.walk(directory_path):
+        for filename in filenames:
+            if "eyepose_events.csv" in filename:
+                file_path = Path(os.path.normpath(os.path.join(dirpath, filename)))
+                try:
+                    process_file(file_path)
+                except pandas.errors.EmptyDataError:
+                    print(f"{Fore.RED}No data found in {file_path}, skipping.{Style.RESET_ALL}")
+
+
+def process_file(file_path):
     config = ProcessingConfig(
         min_multiplier=0.5,
         max_multiplier=10.0,
         constrain_to_plane=True,
         velocity_mode=False,
+        path_timeout=15,
         progress_callback=lambda current, total: print(f"Progress: {current}") if current % 100 == 0 else None
     )
 
     results = process_csv_file(
-        Path("../data/060930011.110425.085748.ESUEvents.eyepose_events.csv"),
+        file_path,
         eye="Left",
-        scale_factor=1920.0,  # Scale to screen pixels
+        x_scale_factor=1920.0,  # Scale to screen pixels
+        y_scale_factor=1080.0,
         config=config
     )
 
     # Display results
     for subject_id, result in results.items():
         print(f"\n{subject_id}:")
-        print(f"  Final D: {result.final_d:.4f}")
-        print(f"  Total steps: {result.total_steps}")
-        print(f"  Path length: {result.path_length:.4f}")
+        print(f"Number of Paths {len(result.time_series)}")
 
         # Save time series
-        result.time_series.to_csv(f"{subject_id}_analysis.csv", index=False)
+        output_file_path = f"{str(file_path)[:-3]}_analysis.csv"
+        result.time_series.to_csv(output_file_path, index=False)
+
+# Example usage
+if __name__ == "__main__":
+    data_root_path = Path(select_data_root())
+    process_directory_tree(data_root_path)
+
+
+
+
+
 
     # Example 2: Process LSL stream with minimal configuration
     # processor = RTFPAProcessor()  # Uses default config

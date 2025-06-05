@@ -50,7 +50,8 @@ class EyeTrackingCSVAdapter(DataAdapter):
 
     file_path: Path
     eye: str = "Left"
-    scale_factor: float = 1.0
+    x_scale_factor: float = 1.0
+    y_scale_factor: float = 1.0
     clip_range: Optional[Tuple[float, float]] = None
 
     # Derived attributes
@@ -67,6 +68,7 @@ class EyeTrackingCSVAdapter(DataAdapter):
 
     def initialize(self, **kwargs) -> None:
         """Load the CSV file"""
+        print(f"Initializing Eye Tracking CSV adapter with {self.file_path}")
         if not self.file_path.exists():
             raise FileNotFoundError(f"CSV file not found: {self.file_path}")
 
@@ -110,8 +112,8 @@ class EyeTrackingCSVAdapter(DataAdapter):
             yield DataPoint(
                 timestamp=row['Time'].to_pydatetime(),
                 subject_id=self.subject_id,
-                x=round(row[self.x_column] * self.scale_factor,1),
-                y=round(row[self.y_column] * self.scale_factor,1),
+                x=round(row[self.x_column] * self.x_scale_factor,1),
+                y=round(row[self.y_column] * self.y_scale_factor,1),
                 z=0.0  # Eye tracking is 2D
             )
 
@@ -126,7 +128,8 @@ class LSLAdapter(DataAdapter):
 
     stream_name: str
     eye: str = "Left"
-    scale_factor: float = 1.0
+    x_scale_factor: float = 1.0
+    y_scale_factor: float = 1.0
 
     # LSL-specific attributes
     inlet: Any = field(init=False, default=None)
@@ -178,8 +181,8 @@ class LSLAdapter(DataAdapter):
                 yield DataPoint(
                     timestamp=dt,
                     subject_id=f"{self.eye}_eye",
-                    x=sample[self.x_index] * self.scale_factor,
-                    y=sample[self.y_index] * self.scale_factor,
+                    x=sample[self.x_index] * self.x_scale_factor,
+                    y=sample[self.y_index] * self.y_scale_factor,
                     z=0.0
                 )
             except IndexError:

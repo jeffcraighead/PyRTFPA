@@ -146,7 +146,7 @@ class RunningD:
 
         # Calculate mean fractal dimension
         if fractal_dimensions:
-            self.D = sum(fractal_dimensions) / len(fractal_dimensions)
+            self.D = round(sum(fractal_dimensions) / len(fractal_dimensions), 4)  # round D to 4 decimal places
         else:
             self.D = 0.0
 
