@@ -35,7 +35,7 @@ class RTFPA:
                     return tracked_running_d
 
             # Check if we need to start a new path
-            time_diff_seconds = abs(timestamp - tracked_running_d.timestamp)
+            time_diff_seconds = abs(timestamp - tracked_running_d.end_timestamp)
 
             if time_diff_seconds > timedelta(seconds=self.seconds_till_new_path):
                 # Start a new path

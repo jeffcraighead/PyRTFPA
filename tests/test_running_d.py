@@ -43,7 +43,7 @@ class TestRunningD:
         assert rd.position.x == 1.0
         assert rd.position.y == 2.0
         assert rd.position.z == 3.0
-        assert rd.timestamp == sample_datetime
+        assert rd.start_timestamp == sample_datetime
         
         # Check array initializations
         assert len(rd.min_sphere_center) == 4

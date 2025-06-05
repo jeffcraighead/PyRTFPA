@@ -62,7 +62,7 @@ class TestRTFPA:
         assert result.position.x == 1.0
         assert result.position.y == 2.0
         assert result.position.z == 3.0
-        assert result.timestamp == sample_datetime
+        assert result.start_timestamp == sample_datetime
         assert "subject1" in sample_rtfpa.tracked_objects_running_d
 
     def test_new_reading_same_position(self, sample_rtfpa, sample_datetime):
@@ -142,7 +142,7 @@ class TestRTFPA:
         rd = sample_rtfpa.tracked_objects_running_d["subject1"]
         assert rd.subject_id == "subject1"
         assert rd.position == point
-        assert rd.timestamp == sample_datetime
+        assert rd.start_timestamp == sample_datetime
 
     def test_continue_path_measurements(self, sample_rtfpa, sample_datetime):
         """Test _continue_path method measurements"""
@@ -159,7 +159,7 @@ class TestRTFPA:
         assert rd.real_path_length == 5.0
         assert rd.mean_step_size == 5.0
         assert rd.position == new_point
-        assert rd.timestamp == new_timestamp
+        assert rd.start_timestamp == new_timestamp
 
     def test_continue_path_measurements_five_steps(self, sample_rtfpa, sample_datetime):
         """Test _continue_path method measurements"""
@@ -185,7 +185,7 @@ class TestRTFPA:
         assert rd.real_path_length == 70.0
         # assert rd.mean_step_size == 5.0
         assert rd.position == end_point
-        assert rd.timestamp == end_time
+        assert rd.start_timestamp == end_time
         assert 1.1 > rd.D > 0.90
 
     def test_continue_path_xy_constraint(self, sample_rtfpa, sample_datetime):

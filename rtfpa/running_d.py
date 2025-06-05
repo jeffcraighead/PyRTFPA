@@ -15,7 +15,7 @@ class RunningD:
     # Required parameters
     subject_id: str
     position: Point3D
-    timestamp: datetime
+    start_timestamp: datetime
     min_multiplier: float
     max_multiplier: float
 
@@ -32,6 +32,7 @@ class RunningD:
     max_step_size: float = 0.0
     mean_step_size: float = 0.0
     velocity_mode: bool = False
+    end_timestamp: datetime = None
 
     # Time and velocity measurements
     step_time: float = 0.0  # Time between successive readings
@@ -47,6 +48,7 @@ class RunningD:
     def __post_init__(self):
         self.min_sphere_center[0] = self.position
         self.max_sphere_center[0] = self.position
+        self.end_timestamp = self.start_timestamp
 
 
     def add_point(self, point: Point3D, timestamp: datetime, constrain_to_plane = False):
@@ -67,8 +69,8 @@ class RunningD:
         self.mean_step_size = self.real_path_length / self.number_of_steps
 
         # Calculate time between readings
-        self.step_time = (timestamp - self.timestamp).total_seconds()
-        self.timestamp = timestamp
+        self.step_time = (timestamp - self.end_timestamp).total_seconds()
+        self.end_timestamp = timestamp
 
         if self.velocity_mode:
             self.mean_step_size /= self.step_time

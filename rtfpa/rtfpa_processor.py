@@ -58,7 +58,7 @@ class RTFPAProcessor:
             # Store results
             if data_point.subject_id not in self.results:
                 self.results[data_point.subject_id] = []
-            if running_d.number_of_steps == 1: # append the running_d object each time we have a new path (thus a new running_d).
+            if running_d.number_of_steps == 0: # append the running_d object each time we have a new path (thus a new running_d).
                 self.results[data_point.subject_id].append(running_d)
 
             point_count += 1
@@ -91,7 +91,9 @@ class RTFPAProcessor:
         data = []
         for rd in self.results[subject_id]:
             data.append({
-                'timestamp': rd.timestamp,
+                'subject_id': rd.subject_id,
+                'start_timestamp': rd.start_timestamp,
+                'end_timestamp': rd.end_timestamp,
                 'D': rd.D,
                 'steps': rd.number_of_steps,
                 'path_length': rd.real_path_length,

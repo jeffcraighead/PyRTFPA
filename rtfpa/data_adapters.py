@@ -110,8 +110,8 @@ class EyeTrackingCSVAdapter(DataAdapter):
             yield DataPoint(
                 timestamp=row['Time'].to_pydatetime(),
                 subject_id=self.subject_id,
-                x=row[self.x_column] * self.scale_factor,
-                y=row[self.y_column] * self.scale_factor,
+                x=round(row[self.x_column] * self.scale_factor,1),
+                y=round(row[self.y_column] * self.scale_factor,1),
                 z=0.0  # Eye tracking is 2D
             )
 
